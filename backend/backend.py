@@ -1,6 +1,6 @@
-""" Selects the backend for the fdtd-package.
+""" Selects the backend for the your computational calculation.
 
-The `fdtd` library allows to choose a backend. The ``numpy`` backend is the
+The library allows to choose a backend. The ``numpy`` backend is the
 default one, but there are also several additional PyTorch backends:
 
     - ``numpy`` (defaults to float64 arrays)
@@ -136,6 +136,9 @@ class NumpyBackend(Backend):
     broadcast_to = staticmethod(numpy.broadcast_to)
     """ broadcast array into shape """
 
+    mean = staticmethod(numpy.mean)
+    """ mean of array """
+
     @staticmethod
     def bmm(arr1, arr2):
         """batch matrix multiply two arrays"""
@@ -145,7 +148,10 @@ class NumpyBackend(Backend):
     def is_array(arr):
         """check if an object is an array"""
         return isinstance(arr, numpy.ndarray)
-
+    @staticmethod
+    def round(arr, decimals=0):
+        """round an array"""
+        return numpy.around(arr, decimals=decimals)
     # constructors
     array = _replace_float(numpy.array)
     """ create an array from an array-like sequence """
@@ -239,6 +245,9 @@ if TORCH_AVAILABLE:
         broadcast_to = staticmethod(torch.broadcast_to)
         """ broadcast array into shape """
 
+        mean = staticmethod(torch.mean)
+        """ mean of array """
+
         reshape = staticmethod(torch.reshape)
         """ reshape array into given shape """
 
@@ -251,6 +260,11 @@ if TORCH_AVAILABLE:
             # is this a reasonable implemenation?
             return isinstance(arr, numpy.ndarray) or torch.is_tensor(arr)
 
+        @staticmethod
+        def round(arr, decimals=0):
+            """round elements in array"""
+            return torch.round(arr,  decimals=decimals)
+        
         def array(self, arr, dtype=None):
             """create an array from an array-like sequence"""
             if dtype is None:
